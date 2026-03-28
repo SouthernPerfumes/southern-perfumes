@@ -11,21 +11,21 @@
     "price": 300,
     "category": "Men",
     "image": "images/ombre.jpg",
-    "description": "أومبري ليذر - رائحة جلدية قوية وأنيقة تعطي حضور رجولي جذاب."
+    "description": "اومبري ليذر - رائحة جلدية قوية وأنيقة تعطي حضور رجولي جذاب."
   },
   {
     "name": "Jean Paul Gaultier Ultra Male",
     "price": 260,
     "category": "Men",
     "image": "images/ultramale.jpg",
-    "description": "ألترا ميل - عطر شبابي حلو ودافئ مناسب للمساء."
+    "description": "الترا ميل - عطر شبابي حلو ودافئ مناسب للمساء."
   },
   {
-    "name": "Eros",
+    "name": "Versace Eros",
     "price": 240,
     "category": "Men",
     "image": "images/eros.jpg",
-    "description": "إيروس - انتعاش قوي مع لمسة فانيليا جذابة."
+    "description": "ايروس - انتعاش قوي مع لمسة فانيليا جذابة."
   },
   {
     "name": "Dior Sauvage",
