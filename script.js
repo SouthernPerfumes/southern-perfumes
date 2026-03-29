@@ -121,7 +121,7 @@ function renderProducts(products, reset = false) {
   const grid    = document.getElementById("productsGrid");
   const countEl = document.getElementById("resultCount");
 
-  if (reset) visibleCount = 6;
+  if (reset) visibleCount = 30;
 
   countEl.textContent = products.length > 0 ? `${products.length} عطر` : "";
 
