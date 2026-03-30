@@ -181,8 +181,37 @@ function renderLoadMore(products) {
     btn = document.createElement("button");
     btn.id = "loadMoreBtn";
     btn.textContent = "تحميل المزيد";
-    btn.style.margin = "20px auto";
-    btn.style.display = "block";
+    
+    // 👇 إضافة التصميم (CSS) للزر ليكون شكله أنيقاً ومناسباً
+    btn.style.cssText = `
+      display: block;
+      margin: 40px auto;
+      padding: 12px 40px;
+      background-color: #222222; /* لون الخلفية أسود أنيق */
+      color: #ffffff; /* لون النص أبيض */
+      border: none;
+      border-radius: 30px; /* حواف دائرية */
+      font-size: 16px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* ظل خفيف */
+      transition: all 0.3s ease; /* حركة ناعمة للتأثيرات */
+    `;
+
+    // 👇 تأثير عند تمرير الماوس (Hover)
+    btn.onmouseover = () => {
+      btn.style.backgroundColor = "#444444"; // تفتيح اللون قليلاً
+      btn.style.transform = "translateY(-3px)"; // رفع الزر للأعلى قليلاً
+      btn.style.boxShadow = "0 6px 15px rgba(0, 0, 0, 0.2)"; // زيادة الظل
+    };
+
+    // 👇 تأثير عند إبعاد الماوس
+    btn.onmouseout = () => {
+      btn.style.backgroundColor = "#222222";
+      btn.style.transform = "translateY(0)";
+      btn.style.boxShadow = "0 4px 10px rgba(0, 0, 0, 0.15)";
+    };
     
     // وضع الزر بعد حاوية العطور مباشرة
     grid.insertAdjacentElement("afterend", btn);
