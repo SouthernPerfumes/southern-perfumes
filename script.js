@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════
 //  عطور الجنوب — Southern Perfumes
-//  script.js  |  All website logic
+//  script.js
 // ═══════════════════════════════════════════════
 
 // ── CONFIG ──
@@ -9,41 +9,15 @@ const FACEBOOK_URL    = "https://www.facebook.com/people/%D8%B9%D8%B7%D9%88%D8%B
 
 const WA_BASE = `https://wa.me/${WHATSAPP_NUMBER}?text=`;
 
-let visibleCount = 20; // عدد المنتجات اللي تظهر في البداية
-const LOAD_STEP = 10;  // كل مرة نزود كام منتج
+// ── PAGINATION CONFIG ──
+let visibleCount = 20;
+const LOAD_STEP  = 10;
 
 // ── STATE ──
-let allProducts   = [];
+let allProducts    = [];
+let filteredList   = [];
 let activeCategory = "الكل";
 let searchQuery    = "";
-
-// ══════════════════════════════════════════════
-//  LAZY LOADING OBSERVER
-// ══════════════════════════════════════════════
-const imageObserver = new IntersectionObserver((entries, observer) => {
-  entries.forEach(entry => {
-    if (!entry.isIntersecting) return;
-
-    const img = entry.target;
-
-    // load image
-    img.src = img.dataset.src;
-
-    img.onload = () => {
-      img.classList.add("loaded");
-    };
-
-    img.onerror = () => {
-      const fallback = img.parentElement.querySelector(".card-emoji-fallback");
-      if (fallback) fallback.style.display = "flex";
-      img.style.display = "none";
-    };
-
-    observer.unobserve(img);
-  });
-}, {
-  rootMargin: "100px"
-});
 
 // ══════════════════════════════════════════════
 //  LOAD PRODUCTS
@@ -54,12 +28,15 @@ fetch("products.json")
     return res.json();
   })
   .then(data => {
-    allProducts = data;
+    allProducts  = data;
+    filteredList = data;
+
     buildCategoryButtons(data);
-    renderProducts(data, true);
+    renderProducts(filteredList, true);
+    initInfiniteScroll();
   })
   .catch(err => {
-    console.error("Error loading products:", err);
+    console.error(err);
     document.getElementById("productsGrid").innerHTML = `
       <div class="empty-state">
         <div class="icon">⚠️</div>
@@ -85,6 +62,7 @@ function buildCategoryButtons(products) {
     btn.addEventListener("click", function () {
       bar.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
       this.classList.add("active");
+
       activeCategory = this.dataset.cat;
       applyFilters();
     });
@@ -111,25 +89,26 @@ function applyFilters() {
     );
   }
 
-  renderProducts(filtered, true);
+  filteredList = filtered;
+  renderProducts(filteredList, true);
 }
 
 // ══════════════════════════════════════════════
-//  RENDER
+//  RENDER PRODUCTS
 // ══════════════════════════════════════════════
 function renderProducts(products, reset = false) {
   const grid    = document.getElementById("productsGrid");
   const countEl = document.getElementById("resultCount");
 
-  if (reset) visibleCount = 30;
+  if (reset) visibleCount = 20;
 
-  countEl.textContent = products.length > 0 ? `${products.length} عطر` : "";
+  countEl.textContent = products.length ? `${products.length} عطر` : "";
 
   if (products.length === 0) {
     grid.innerHTML = `
       <div class="empty-state">
         <div class="icon">🔍</div>
-        <p>لا توجد نتائج. جرّب البحث بكلمة مختلفة.</p>
+        <p>لا توجد نتائج</p>
       </div>`;
     return;
   }
@@ -143,20 +122,14 @@ function renderProducts(products, reset = false) {
     const visual = p.image
       ? `
         <div class="img-placeholder"></div>
-        <img data-src="${p.image}" alt="${p.name}" class="card-img lazy-img"/>
+        <img data-src="${p.image}" class="card-img lazy-img" alt="${p.name}">
         <div class="card-emoji-fallback" style="display:none">
           ${p.emoji || "🧴"}
         </div>`
       : `<div class="card-emoji-fallback">${p.emoji || "🧴"}</div>`;
 
-    initLazyLoading();
-
-  // 👇 زر تحميل المزيد
-  renderLoadMore(products);
-    
     return `
-      <div class="product-card" style="animation-delay:${i * 0.06}s">
-        <div class="card-topline"></div>
+      <div class="product-card" style="animation-delay:${i * 0.05}s">
         <div class="card-visual">${visual}</div>
         <div class="card-body">
           <div class="card-cat">${p.category}</div>
@@ -170,31 +143,55 @@ function renderProducts(products, reset = false) {
         </div>
       </div>`;
   }).join("");
+
+  initLazyLoading();
 }
 
-function renderLoadMore(products) {
-  let btn = document.getElementById("loadMoreBtn");
+// ══════════════════════════════════════════════
+//  LAZY LOADING
+// ══════════════════════════════════════════════
+function initLazyLoading() {
+  const images = document.querySelectorAll(".lazy-img");
 
-  if (!btn) {
-    btn = document.createElement("button");
-    btn.id = "loadMoreBtn";
-    btn.textContent = "تحميل المزيد";
-    btn.style.margin = "20px auto";
-    btn.style.display = "block";
-    document.body.appendChild(btn);
-  }
+  const observer = new IntersectionObserver((entries, obs) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
 
-  if (visibleCount >= products.length) {
-    btn.style.display = "none";
-    return;
-  }
+      const img = entry.target;
+      img.src = img.dataset.src;
 
-  btn.style.display = "block";
+      img.onload = () => img.classList.add("loaded");
 
-  btn.onclick = () => {
-    visibleCount += LOAD_STEP;
-    renderProducts(products, false);
-  };
+      img.onerror = () => {
+        const fallback = img.parentElement.querySelector(".card-emoji-fallback");
+        if (fallback) fallback.style.display = "flex";
+        img.remove();
+      };
+
+      obs.unobserve(img);
+    });
+  }, { rootMargin: "100px" });
+
+  images.forEach(img => observer.observe(img));
+}
+
+// ══════════════════════════════════════════════
+//  INFINITE SCROLL (AUTO LOAD)
+// ══════════════════════════════════════════════
+function initInfiniteScroll() {
+  window.addEventListener("scroll", () => {
+
+    const nearBottom =
+      window.innerHeight + window.scrollY >= document.body.offsetHeight - 200;
+
+    if (nearBottom) {
+      if (visibleCount < filteredList.length) {
+        visibleCount += LOAD_STEP;
+        renderProducts(filteredList);
+      }
+    }
+
+  });
 }
 
 // ══════════════════════════════════════════════
@@ -215,49 +212,3 @@ function setSocialLinks() {
   document.querySelectorAll(".js-fb-link").forEach(el => el.href = FACEBOOK_URL);
 }
 setSocialLinks();
-
-// ══════════════════════════════════════════════
-//  8. LAZY LOADING IMAGES
-// ══════════════════════════════════════════════
-
-function initLazyLoading() {
-  const images = document.querySelectorAll(".lazy-img");
-
-  const observer = new IntersectionObserver((entries, obs) => {
-    entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-
-      const img = entry.target;
-      const src = img.getAttribute("data-src");
-
-      if (src) {
-        img.src = src;
-
-        img.onload = () => {
-          img.classList.add("loaded");
-
-          // remove placeholder
-          const placeholder = img.parentElement.querySelector(".img-placeholder");
-          if (placeholder) placeholder.remove();
-        };
-
-        img.onerror = () => {
-          // fallback to emoji
-          const fallback = img.parentElement.querySelector(".card-emoji-fallback");
-          if (fallback) fallback.style.display = "flex";
-
-          const placeholder = img.parentElement.querySelector(".img-placeholder");
-          if (placeholder) placeholder.remove();
-
-          img.remove();
-        };
-      }
-
-      obs.unobserve(img);
-    });
-  }, {
-    rootMargin: "100px"
-  });
-
-  images.forEach(img => observer.observe(img));
-}
