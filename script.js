@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════
 //  عطور الجنوب — Southern Perfumes
-//  script.js
+//  script.js  |  All website logic
 // ═══════════════════════════════════════════════
 
 // ── CONFIG ──
@@ -9,41 +9,41 @@ const FACEBOOK_URL    = "https://www.facebook.com/people/%D8%B9%D8%B7%D9%88%D8%B
 
 const WA_BASE = `https://wa.me/${WHATSAPP_NUMBER}?text=`;
 
-// ── PAGINATION CONFIG ──
-let visibleCount = 20;
-const LOAD_STEP  = 10;
+let visibleCount = 20; // عدد المنتجات اللي تظهر في البداية
+const LOAD_STEP = 10;  // كل مرة نزود كام منتج
 
 // ── STATE ──
-let allProducts    = [];
-let filteredList   = [];
+let allProducts   = [];
 let activeCategory = "الكل";
 let searchQuery    = "";
 
 // ══════════════════════════════════════════════
-//  LAZY LOADING OBSERVER (تعريف المراقب مرة واحدة لتحسين الأداء)
+//  LAZY LOADING OBSERVER
 // ══════════════════════════════════════════════
-const imageObserver = new IntersectionObserver((entries, obs) => {
+const imageObserver = new IntersectionObserver((entries, observer) => {
   entries.forEach(entry => {
     if (!entry.isIntersecting) return;
 
     const img = entry.target;
+
+    // load image
     img.src = img.dataset.src;
 
-    // عند نجاح تحميل الصورة
     img.onload = () => {
       img.classList.add("loaded");
     };
 
-    // عند فشل تحميل الصورة (إظهار البديل)
     img.onerror = () => {
       const fallback = img.parentElement.querySelector(".card-emoji-fallback");
       if (fallback) fallback.style.display = "flex";
-      img.remove(); // إزالة الصورة التالفة من الـ DOM
+      img.style.display = "none";
     };
 
-    obs.unobserve(img); // إيقاف مراقبة الصورة بعد معالجتها
+    observer.unobserve(img);
   });
-}, { rootMargin: "100px" });
+}, {
+  rootMargin: "100px"
+});
 
 // ══════════════════════════════════════════════
 //  LOAD PRODUCTS
@@ -54,15 +54,12 @@ fetch("products.json")
     return res.json();
   })
   .then(data => {
-    allProducts  = data;
-    filteredList = data;
-
+    allProducts = data;
     buildCategoryButtons(data);
-    renderProducts(filteredList, true);
-    initInfiniteScroll();
+    renderProducts(data, true);
   })
   .catch(err => {
-    console.error(err);
+    console.error("Error loading products:", err);
     document.getElementById("productsGrid").innerHTML = `
       <div class="empty-state">
         <div class="icon">⚠️</div>
@@ -88,7 +85,6 @@ function buildCategoryButtons(products) {
     btn.addEventListener("click", function () {
       bar.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
       this.classList.add("active");
-
       activeCategory = this.dataset.cat;
       applyFilters();
     });
@@ -115,100 +111,99 @@ function applyFilters() {
     );
   }
 
-  filteredList = filtered;
-  renderProducts(filteredList, true);
+  renderProducts(filtered, true);
 }
 
 // ══════════════════════════════════════════════
-//  RENDER PRODUCTS
+//  RENDER
 // ══════════════════════════════════════════════
 function renderProducts(products, reset = false) {
-  const grid = document.getElementById("productsGrid");
+  const grid    = document.getElementById("productsGrid");
+  const countEl = document.getElementById("resultCount");
 
-  if (reset) {
-    visibleCount = 20;
-    grid.innerHTML = ""; // مسح مرة واحدة
+  if (reset) visibleCount = 30;
+
+  countEl.textContent = products.length > 0 ? `${products.length} عطر` : "";
+
+  if (products.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">🔍</div>
+        <p>لا توجد نتائج. جرّب البحث بكلمة مختلفة.</p>
+      </div>`;
+    return;
   }
 
-  const currentItems = grid.children.length;
-  const nextItems = products.slice(currentItems, visibleCount);
+  const visibleProducts = products.slice(0, visibleCount);
 
-  if (nextItems.length === 0) return; // لا يوجد عناصر جديدة لإضافتها
-
-  const html = nextItems.map((p, i) => {
+  grid.innerHTML = visibleProducts.map((p, i) => {
     const waMsg  = encodeURIComponent(`السلام عليكم، أريد الاستفسار عن: ${p.name} 🌹`);
     const waLink = WA_BASE + waMsg;
 
     const visual = p.image
       ? `
         <div class="img-placeholder"></div>
-        <img data-src="${p.image}" class="card-img lazy-img" alt="${p.name}">
+        <img data-src="${p.image}" alt="${p.name}" class="card-img lazy-img"/>
         <div class="card-emoji-fallback" style="display:none">
           ${p.emoji || "🧴"}
         </div>`
       : `<div class="card-emoji-fallback">${p.emoji || "🧴"}</div>`;
 
+    initLazyLoading();
+
+  // 👇 زر تحميل المزيد
+  renderLoadMore(products);
+    
     return `
-      <div class="product-card">
+      <div class="product-card" style="animation-delay:${i * 0.06}s">
+        <div class="card-topline"></div>
         <div class="card-visual">${visual}</div>
         <div class="card-body">
+          <div class="card-cat">${p.category}</div>
           <div class="card-name">${p.name}</div>
-          <a href="${waLink}" target="_blank">استفسر</a>
+          ${p.brand ? `<div class="card-brand">${p.brand}</div>` : ""}
+          ${p.desc  ? `<div class="card-desc">${p.desc}</div>`   : ""}
+          <div class="card-footer">
+            <a class="card-wa" href="${waLink}" target="_blank">استفسر</a>
+            <div class="card-price">${p.price || ""}</div>
+          </div>
         </div>
       </div>`;
   }).join("");
-
-  grid.insertAdjacentHTML("beforeend", html);
-
-  initLazyLoading();
 }
 
-// ══════════════════════════════════════════════
-//  LAZY LOADING INIT
-// ══════════════════════════════════════════════
-function initLazyLoading() {
-  const images = document.querySelectorAll(".lazy-img:not([data-observed])");
-  
-  images.forEach(img => {
-    imageObserver.observe(img);
-    img.setAttribute('data-observed', 'true'); // تعليم الصورة حتى لا نراقبها مرتين
-  });
-}
+function renderLoadMore(products) {
+  let btn = document.getElementById("loadMoreBtn");
 
-// ══════════════════════════════════════════════
-//  INFINITE SCROLL (AUTO LOAD)
-// ══════════════════════════════════════════════
-function initInfiniteScroll() {
-  let loading = false;
+  if (!btn) {
+    btn = document.createElement("button");
+    btn.id = "loadMoreBtn";
+    btn.textContent = "تحميل المزيد";
+    btn.style.margin = "20px auto";
+    btn.style.display = "block";
+    document.body.appendChild(btn);
+  }
 
-  window.addEventListener("scroll", () => {
-    if (loading) return;
+  if (visibleCount >= products.length) {
+    btn.style.display = "none";
+    return;
+  }
 
-    // توافقية أفضل مع المتصفحات لحساب التمرير
-    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-    const nearBottom = scrollTop + clientHeight >= scrollHeight - 200;
+  btn.style.display = "block";
 
-    if (nearBottom && visibleCount < filteredList.length) {
-      loading = true;
-      visibleCount += LOAD_STEP;
-      
-      renderProducts(filteredList);
-
-      setTimeout(() => loading = false, 300);
-    }
-  });
+  btn.onclick = () => {
+    visibleCount += LOAD_STEP;
+    renderProducts(products, false);
+  };
 }
 
 // ══════════════════════════════════════════════
 //  SEARCH
 // ══════════════════════════════════════════════
-const searchInput = document.getElementById("searchInput");
-if (searchInput) {
-  searchInput.addEventListener("input", function () {
-    searchQuery = this.value.trim();
-    applyFilters();
-  });
-}
+document.getElementById("searchInput").addEventListener("input", function () {
+  searchQuery = this.value.trim();
+  applyFilters();
+});
 
 // ══════════════════════════════════════════════
 //  SOCIAL LINKS
@@ -220,3 +215,51 @@ function setSocialLinks() {
   document.querySelectorAll(".js-fb-link").forEach(el => el.href = FACEBOOK_URL);
 }
 setSocialLinks();
+
+// ══════════════════════════════════════════════
+//  8. LAZY LOADING IMAGES
+// ══════════════════════════════════════════════
+
+function initLazyLoading() {
+  const images = document.querySelectorAll(".lazy-img");
+
+  const observer = new IntersectionObserver((entries, obs) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+
+      const img = entry.target;
+      const src = img.getAttribute("data-src");
+
+      if (src) {
+        img.src = src;
+
+        img.onload = () => {
+          img.classList.add("loaded");
+
+          // remove placeholder
+          const placeholder = img.parentElement.querySelector(".img-placeholder");
+          if (placeholder) placeholder.remove();
+        };
+
+        img.onerror = () => {
+          // fallback to emoji
+          const fallback = img.parentElement.querySelector(".card-emoji-fallback");
+          if (fallback) fallback.style.display = "flex";
+
+          const placeholder = img.parentElement.querySelector(".img-placeholder");
+          if (placeholder) placeholder.remove();
+
+          img.remove();
+        };
+      }
+
+      obs.unobserve(img);
+    });
+  }, {
+    rootMargin: "100px"
+  });
+
+  images.forEach(img => observer.observe(img));
+}
+
+انا عايزها تظهر بعد جدول العطور
