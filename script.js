@@ -9,8 +9,8 @@ const FACEBOOK_URL    = "https://www.facebook.com/people/%D8%B9%D8%B7%D9%88%D8%B
 
 const WA_BASE = `https://wa.me/${WHATSAPP_NUMBER}?text=`;
 
-let visibleCount = 20; // عدد المنتجات اللي تظهر في البداية
-const LOAD_STEP = 10;  // كل مرة نزود كام منتج
+let visibleCount = 15; // عدد المنتجات اللي تظهر في البداية
+const LOAD_STEP = 15;  // كل مرة نزود كام منتج
 
 // ── STATE ──
 let allProducts   = [];
@@ -121,7 +121,7 @@ function renderProducts(products, reset = false) {
   const grid    = document.getElementById("productsGrid");
   const countEl = document.getElementById("resultCount");
 
-  if (reset) visibleCount = 30;
+  if (reset) visibleCount = 15;
 
   countEl.textContent = products.length > 0 ? `${products.length} عطر` : "";
 
