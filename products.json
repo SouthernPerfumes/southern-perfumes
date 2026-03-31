@@ -35,13 +35,13 @@
   {
     "id": 4,
     "name": "اديداس",
-    "brand": "متنوع",
+    "brand": "اديداس",
     "category": "Men",
     "size": "50ml",
     "price": "300 جنيه",
     "emoji": "🖤",
     "desc": "عطر رياضي منعش يجمع الحمضيات والأعشاب الخضراء مع المسك، خفيف ومناسب للاستخدام اليومي.",
-    "image": "images/placeholder.jpg"
+    "image": "images/adidas.jpg"
   },
   {
     "id": 5,
