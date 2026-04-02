@@ -9,41 +9,13 @@ const FACEBOOK_URL    = "https://www.facebook.com/people/%D8%B9%D8%B7%D9%88%D8%B
 
 const WA_BASE = `https://wa.me/${WHATSAPP_NUMBER}?text=`;
 
-let visibleCount = 15; // عدد المنتجات اللي تظهر في البداية
-const LOAD_STEP = 15;  // كل مرة نزود كام منتج
+let visibleCount = 15;
+const LOAD_STEP  = 15;
 
 // ── STATE ──
-let allProducts   = [];
+let allProducts    = [];
 let activeCategory = "الكل";
 let searchQuery    = "";
-
-// ══════════════════════════════════════════════
-//  LAZY LOADING OBSERVER
-// ══════════════════════════════════════════════
-const imageObserver = new IntersectionObserver((entries, observer) => {
-  entries.forEach(entry => {
-    if (!entry.isIntersecting) return;
-
-    const img = entry.target;
-
-    // load image
-    img.src = img.dataset.src;
-
-    img.onload = () => {
-      img.classList.add("loaded");
-    };
-
-    img.onerror = () => {
-      const fallback = img.parentElement.querySelector(".card-emoji-fallback");
-      if (fallback) fallback.style.display = "flex";
-      img.style.display = "none";
-    };
-
-    observer.unobserve(img);
-  });
-}, {
-  rootMargin: "100px"
-});
 
 // ══════════════════════════════════════════════
 //  LOAD PRODUCTS
@@ -106,7 +78,7 @@ function applyFilters() {
     filtered = filtered.filter(p =>
       p.name.toLowerCase().includes(q) ||
       (p.brand || "").toLowerCase().includes(q) ||
-      (p.desc || "").toLowerCase().includes(q) ||
+      (p.desc  || "").toLowerCase().includes(q) ||
       p.category.toLowerCase().includes(q)
     );
   }
@@ -115,7 +87,7 @@ function applyFilters() {
 }
 
 // ══════════════════════════════════════════════
-//  RENDER (التعديلات تم تطبيقها هنا)
+//  RENDER
 // ══════════════════════════════════════════════
 function renderProducts(products, reset = false) {
   const grid    = document.getElementById("productsGrid");
@@ -131,8 +103,7 @@ function renderProducts(products, reset = false) {
         <div class="icon">🔍</div>
         <p>لا توجد نتائج. جرّب البحث بكلمة مختلفة.</p>
       </div>`;
-      
-    renderLoadMore([]); // إخفاء الزر لو مفيش منتجات
+    renderLoadMore([]);
     return;
   }
 
@@ -142,19 +113,60 @@ function renderProducts(products, reset = false) {
     const waMsg  = encodeURIComponent(`السلام عليكم، أريد الاستفسار عن: ${p.name} 🌹`);
     const waLink = WA_BASE + waMsg;
 
+    // ─────────────────────────────────────────────────────────────
+    //  VISUAL BLOCK
+    //  • The wrapper (.card-visual) uses flex to center its child.
+    //  • The <img> uses object-fit:contain so it is never cropped
+    //    or stretched — it simply scales down to fit inside the box.
+    //  • Width & height on the img are set to 100% of the wrapper,
+    //    while object-fit:contain keeps the aspect ratio intact.
+    // ─────────────────────────────────────────────────────────────
+    const VISUAL_HEIGHT = "220px";  // ← change this one value to resize all images
+
     const visual = p.image
       ? `
-        <div class="img-placeholder"></div>
-        <img data-src="${p.image}" alt="${p.name}" class="card-img lazy-img"/>
-        <div class="card-emoji-fallback" style="display:none">
+        <div class="img-placeholder"
+             style="position:absolute;inset:0;background:linear-gradient(135deg,#1a1a1a 25%,#2a2a2a 100%);border-radius:inherit;"></div>
+        <img data-src="${p.image}"
+             alt="${p.name}"
+             class="card-img lazy-img"
+             style="
+               position: absolute;
+               inset: 0;
+               width: 100%;
+               height: 100%;
+               object-fit: contain;
+               object-position: center;
+               padding: 10px;
+               box-sizing: border-box;
+               opacity: 0;
+               transition: opacity 0.4s ease;
+             "/>
+        <div class="card-emoji-fallback"
+             style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;font-size:3rem;">
           ${p.emoji || "🧴"}
         </div>`
-      : `<div class="card-emoji-fallback">${p.emoji || "🧴"}</div>`;
+      : `<div class="card-emoji-fallback"
+              style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:3rem;">
+           ${p.emoji || "🧴"}
+         </div>`;
 
     return `
       <div class="product-card" style="animation-delay:${i * 0.06}s">
         <div class="card-topline"></div>
-        <div class="card-visual">${visual}</div>
+
+        <div class="card-visual"
+             style="
+               position: relative;
+               width: 100%;
+               height: ${VISUAL_HEIGHT};
+               overflow: hidden;
+               background: #111;
+               border-radius: 10px 10px 0 0;
+             ">
+          ${visual}
+        </div>
+
         <div class="card-body">
           <div class="card-cat">${p.category}</div>
           <div class="card-name">${p.name}</div>
@@ -168,52 +180,49 @@ function renderProducts(products, reset = false) {
       </div>`;
   }).join("");
 
-  // استدعاء الدوال خارج حلقة التكرار لتحسين الأداء
   initLazyLoading();
   renderLoadMore(products);
 }
 
+// ══════════════════════════════════════════════
+//  LOAD MORE BUTTON
+// ══════════════════════════════════════════════
 function renderLoadMore(products) {
   let btn = document.getElementById("loadMoreBtn");
-  const grid = document.getElementById("productsGrid"); // جلب حاوية العطور
+  const grid = document.getElementById("productsGrid");
 
   if (!btn) {
     btn = document.createElement("button");
     btn.id = "loadMoreBtn";
     btn.textContent = "تحميل المزيد";
-    
-    // 👇 إضافة التصميم (CSS) للزر ليكون شكله أنيقاً ومناسباً
+
     btn.style.cssText = `
       display: block;
       margin: 40px auto;
       padding: 12px 40px;
-      background-color: #222222; /* لون الخلفية أسود أنيق */
-      color: #ffffff; /* لون النص أبيض */
+      background-color: #222222;
+      color: #ffffff;
       border: none;
-      border-radius: 30px; /* حواف دائرية */
+      border-radius: 30px;
       font-size: 16px;
       font-weight: 600;
       font-family: inherit;
       cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* ظل خفيف */
-      transition: all 0.3s ease; /* حركة ناعمة للتأثيرات */
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
     `;
 
-    // 👇 تأثير عند تمرير الماوس (Hover)
     btn.onmouseover = () => {
-      btn.style.backgroundColor = "#444444"; // تفتيح اللون قليلاً
-      btn.style.transform = "translateY(-3px)"; // رفع الزر للأعلى قليلاً
-      btn.style.boxShadow = "0 6px 15px rgba(0, 0, 0, 0.2)"; // زيادة الظل
+      btn.style.backgroundColor = "#444444";
+      btn.style.transform        = "translateY(-3px)";
+      btn.style.boxShadow        = "0 6px 15px rgba(0,0,0,0.2)";
     };
-
-    // 👇 تأثير عند إبعاد الماوس
     btn.onmouseout = () => {
       btn.style.backgroundColor = "#222222";
-      btn.style.transform = "translateY(0)";
-      btn.style.boxShadow = "0 4px 10px rgba(0, 0, 0, 0.15)";
+      btn.style.transform        = "translateY(0)";
+      btn.style.boxShadow        = "0 4px 10px rgba(0,0,0,0.15)";
     };
-    
-    // وضع الزر بعد حاوية العطور مباشرة
+
     grid.insertAdjacentElement("afterend", btn);
   }
 
@@ -223,7 +232,6 @@ function renderLoadMore(products) {
   }
 
   btn.style.display = "block";
-
   btn.onclick = () => {
     visibleCount += LOAD_STEP;
     renderProducts(products, false);
@@ -243,14 +251,13 @@ document.getElementById("searchInput").addEventListener("input", function () {
 // ══════════════════════════════════════════════
 function setSocialLinks() {
   const waDefault = WA_BASE + encodeURIComponent("السلام عليكم");
-
   document.querySelectorAll(".js-wa-link").forEach(el => el.href = waDefault);
   document.querySelectorAll(".js-fb-link").forEach(el => el.href = FACEBOOK_URL);
 }
 setSocialLinks();
 
 // ══════════════════════════════════════════════
-//  8. LAZY LOADING IMAGES
+//  LAZY LOADING IMAGES
 // ══════════════════════════════════════════════
 function initLazyLoading() {
   const images = document.querySelectorAll(".lazy-img");
@@ -266,15 +273,16 @@ function initLazyLoading() {
         img.src = src;
 
         img.onload = () => {
-          img.classList.add("loaded");
+          // fade in the image
+          img.style.opacity = "1";
 
-          // remove placeholder
+          // remove the shimmer placeholder
           const placeholder = img.parentElement.querySelector(".img-placeholder");
           if (placeholder) placeholder.remove();
         };
 
         img.onerror = () => {
-          // fallback to emoji
+          // show emoji fallback
           const fallback = img.parentElement.querySelector(".card-emoji-fallback");
           if (fallback) fallback.style.display = "flex";
 
@@ -287,9 +295,7 @@ function initLazyLoading() {
 
       obs.unobserve(img);
     });
-  }, {
-    rootMargin: "100px"
-  });
+  }, { rootMargin: "100px" });
 
   images.forEach(img => observer.observe(img));
 }
