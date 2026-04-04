@@ -17,7 +17,7 @@
     "price_30": "160 جنيه", "price_50": "300 جنيه", "price_100": "500 جنيه",
     "emoji": "🖤",
     "desc": "عطر مائي منعش بنفحات الحمضيات والأعشاب البحرية والمسك الأبيض، يوحي بالطازجية طوال اليوم.",
-    "image": "images/placeholder.jpg"
+    "image": "images/eternity.jpg"
   },
   {
     "id": 3,
@@ -47,7 +47,7 @@
     "price_30": "160 جنيه", "price_50": "300 جنيه", "price_100": "500 جنيه",
     "emoji": "🖤",
     "desc": "عطر كلاسيكي يجمع الخزامى والبتشولي والصندل، من أيقونات العطور الرجالية الخالدة.",
-    "image": "images/placeholder.jpg"
+    "image": "images/aramis.jpg"
   },
   {
     "id": 6,
@@ -57,7 +57,7 @@
     "price_30": "160 جنيه", "price_50": "300 جنيه", "price_100": "500 جنيه",
     "emoji": "🌸",
     "desc": "عطر شرقي دافئ يمزج الورد والمسك مع لمسات من التوابل، أنيق وثابت.",
-    "image": "images/erbapure.jpg"
+    "image": "images/erbapure2.jpg"
   },
   {
     "id": 7,
@@ -67,7 +67,7 @@
     "price_30": "160 جنيه", "price_50": "300 جنيه", "price_100": "500 جنيه",
     "emoji": "🖤",
     "desc": "عطر شرقي دافئ يمزج الورد والمسك مع لمسات من التوابل، أنيق وثابت.",
-    "image": "images/placeholder.jpg"
+    "image": "images/erbapure1.jpg"
   },
   {
     "id": 8,
@@ -77,7 +77,7 @@
     "price_30": "160 جنيه", "price_50": "300 جنيه", "price_100": "500 جنيه",
     "emoji": "🖤",
     "desc": "عطر شرقي حسي بنفحات التبغ والليمون والبنكا، من أشهر العطور الرجالية الكلاسيكية.",
-    "image": "images/placeholder.jpg"
+    "image": "images/armani_code.jpg"
   },
   {
     "id": 9,
@@ -87,7 +87,7 @@
     "price_30": "160 جنيه", "price_50": "300 جنيه", "price_100": "500 جنيه",
     "emoji": "🌙",
     "desc": "عطر ليلي غامض يمزج التوابل والعنبر مع المسك، فاخر ومناسب للسهرات.",
-    "image": "images/placeholder.jpg"
+    "image": "images/azzaro_by.jpg"
   },
   {
     "id": 10,
@@ -97,7 +97,7 @@
     "price_30": "160 جنيه", "price_50": "300 جنيه", "price_100": "500 جنيه",
     "emoji": "🖤",
     "desc": "عطر شرقي فاكهي يفتح على الجريب فروت والتفاح مع قلب من القرنفل وقاعدة عنبرية دافئة.",
-    "image": "images/placeholder.jpg"
+    "image": "images/azzaro_wanted.jpg"
   },
   {
     "id": 11,
@@ -107,7 +107,7 @@
     "price_30": "160 جنيه", "price_50": "300 جنيه", "price_100": "500 جنيه",
     "emoji": "🌸",
     "desc": "عطر مسكي عربي ناعم يمزج المسك الأبيض مع الورد وخشب الصندل، راقٍ وخفيف.",
-    "image": "images/placeholder.jpg"
+    "image": "images/asad_lattafa.jpg"
   },
   {
     "id": 12,
@@ -117,7 +117,7 @@
     "price_30": "160 جنيه", "price_50": "300 جنيه", "price_100": "500 جنيه",
     "emoji": "🖤",
     "desc": "عطر مسكي عربي ناعم يمزج المسك الأبيض مع الورد وخشب الصندل، راقٍ وخفيف.",
-    "image": "images/placeholder.jpg"
+    "image": "images/asad_lattafa.jpg"
   },
   {
     "id": 13,
