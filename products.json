@@ -67,7 +67,7 @@
     "price_30": "160 جنيه", "price_50": "300 جنيه", "price_100": "500 جنيه",
     "emoji": "🖤",
     "desc": "عطر شرقي دافئ يمزج الورد والمسك مع لمسات من التوابل، أنيق وثابت.",
-    "image": "images/erbapure1.jpg"
+    "image": "images/erbapure.jpg"
   },
   {
     "id": 8,
@@ -127,7 +127,7 @@
     "price_30": "160 جنيه", "price_50": "300 جنيه", "price_100": "500 جنيه",
     "emoji": "🖤",
     "desc": "عطر كالفن كلاين الأيقوني يمزج الفواكه الاستوائية مع الأزهار والخشب، منعش وشبابي.",
-    "image": "images/placeholder.jpg"
+    "image": "images/escape.jpg"
   },
   {
     "id": 14,
@@ -137,7 +137,7 @@
     "price_30": "160 جنيه", "price_50": "300 جنيه", "price_100": "500 جنيه",
     "emoji": "🖤",
     "desc": "عطر مائي مشمس يوحي بأجواء البحر مع نفحات من البرغموت والمسك، منعش وحيوي.",
-    "image": "images/placeholder.jpg"
+    "image": "images/afternoon.jpg"
   },
   {
     "id": 15,
@@ -147,7 +147,7 @@
     "price_30": "160 جنيه", "price_50": "300 جنيه", "price_100": "500 جنيه",
     "emoji": "🖤",
     "desc": "عطر امواج الفاخر يجمع الياسمين والورد مع خشب الأرز والمسك، أنيق ومتطور.",
-    "image": "images/placeholder.jpg"
+    "image": "images/accento.jpg"
   },
   {
     "id": 16,
