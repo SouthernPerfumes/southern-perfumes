@@ -5,5 +5,11 @@
     "desc": "3 عبوات + 3 عبوات هدية",
     "image": "images/offers/offer_عروض_تصفيات_الشتاء_حتي_12_ابريل_1775930538851.jfif",
     "active": true
+  },
+  {
+    "id": 2,
+    "title": "خصم 30%",
+    "image": "images/offers/offer_خصم_30_1775931262173.jfif",
+    "active": true
   }
 ]
