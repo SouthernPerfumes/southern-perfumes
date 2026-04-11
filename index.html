@@ -444,6 +444,109 @@
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+/* ════ OFFERS ════ */
+#offers {
+  background: var(--dark);
+  border-top: 1px solid var(--border);
+  padding: 60px 32px;
+  display: none; /* shown by JS only when offers exist */
+}
+#offers.has-offers { display: block; }
+.offers-header {
+  max-width: 1200px; margin: 0 auto 36px;
+  display: flex; align-items: center; justify-content: flex-end; gap: 14px;
+}
+.offers-header-title {
+  font-family: 'Amiri', serif; font-size: 2rem;
+  color: var(--gold-lt);
+  display: flex; align-items: center; gap: 14px;
+}
+.offers-header-title::before {
+  content: ''; flex: 1; max-width: 60px;
+  height: 1px; background: var(--gold); opacity: 0.3;
+}
+.offers-badge {
+  font-size: 0.58rem; letter-spacing: 0.25em; font-family: 'Tajawal', sans-serif;
+  color: var(--gold); background: rgba(201,168,76,0.08);
+  border: 1px solid rgba(201,168,76,0.2);
+  padding: 4px 12px; border-radius: 2px;
+}
+.offers-grid {
+  max-width: 1200px; margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+.offer-card {
+  position: relative; border-radius: 4px; overflow: hidden;
+  border: 1px solid rgba(201,168,76,0.15);
+  background: var(--dark2);
+  transition: transform 0.35s, box-shadow 0.35s;
+  animation: fadeUp 0.5s ease both;
+}
+.offer-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,168,76,0.3);
+}
+.offer-card-img {
+  width: 100%; height: 240px;
+  object-fit: cover; display: block;
+  transition: transform 0.5s;
+}
+.offer-card:hover .offer-card-img { transform: scale(1.03); }
+.offer-card-img-wrap {
+  overflow: hidden; position: relative;
+}
+.offer-card-img-wrap::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.75) 100%);
+}
+.offer-img-placeholder {
+  width: 100%; height: 240px;
+  background: linear-gradient(135deg, var(--dark2), var(--dark3));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 4rem; color: var(--gold); opacity: 0.2;
+}
+.offer-topline {
+  height: 2px;
+  background: linear-gradient(to left, transparent, var(--gold), transparent);
+}
+.offer-card-body { padding: 18px 20px 20px; }
+.offer-label {
+  font-size: 0.58rem; letter-spacing: 0.3em; color: var(--gold);
+  margin-bottom: 7px; text-transform: uppercase;
+  display: flex; align-items: center; gap: 7px;
+}
+.offer-label::before {
+  content: ''; display: inline-block;
+  width: 18px; height: 1px; background: var(--gold); opacity: 0.4;
+}
+.offer-title {
+  font-family: 'Amiri', serif; font-size: 1.5rem;
+  color: var(--gold-lt); margin-bottom: 8px; line-height: 1.3;
+}
+.offer-desc {
+  font-size: 0.82rem; color: var(--text-dim);
+  line-height: 1.9; font-weight: 300; margin-bottom: 16px;
+}
+.offer-cta {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 20px; border-radius: 2px;
+  background: rgba(37,211,102,0.08);
+  border: 1px solid rgba(37,211,102,0.22);
+  color: #25d366; font-size: 0.76rem;
+  font-family: 'Tajawal', sans-serif; text-decoration: none;
+  transition: all 0.28s;
+}
+.offer-cta:hover { background: rgba(37,211,102,0.16); }
+.offer-cta svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+@media(max-width:768px){
+  #offers { padding: 40px 18px; }
+  .offers-grid { grid-template-columns: 1fr; }
+}
+
   </style>
 </head>
 <body>
@@ -462,6 +565,7 @@
   </div>
   <nav>
     <a href="#contact">تواصل</a>
+    <a href="#offers">العروض</a>
     <a href="#collection">العطور</a>
   </nav>
   <a class="header-logo" href="#home">
@@ -519,6 +623,15 @@
     <span>القاهرة — مصر</span><span class="dot">◆</span>
   </div>
 </div>
+
+<!-- ════════ OFFERS ════════ -->
+<section id="offers">
+  <div class="offers-header">
+    <div class="offers-header-title">العروض الحالية</div>
+    <span class="offers-badge">OFFERS</span>
+  </div>
+  <div class="offers-grid" id="offersGrid"></div>
+</section>
 
 <!-- ════════ COLLECTION ════════ -->
 <section id="collection">
